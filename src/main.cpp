@@ -23,11 +23,7 @@
 // }
 #include <WiFi.h>
 #include <HTTPClient.h>
-
-const char* ssid = "DESKTOP-TU5CKDL 2048";
-const char* password = "qC66,917";
-
-String serverUrl = "https://script.google.com/macros/s/AKfycbwv2hPk6ybB5bYykPPKfHXGZeF1CQssD9y_49MqtogPjYPfsEYfiGesXNLB0aLKfO6Jkw/exec";
+#include "secrets.h"
 
 #define TOUCH_PIN T0
 #define LED_PIN 5
@@ -44,7 +40,7 @@ void wifiTask(void *pvParameters) {
       // HTTPClient http;
       HTTPClient http;
 
-      http.begin(serverUrl);
+      http.begin(SERVER_URL);
       http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
       http.addHeader("Content-Type", "application/json");
 
@@ -68,7 +64,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
 
   // Wi-Fi接続
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
   }
