@@ -18,19 +18,26 @@ Migrate an ESP32 data pipeline from Google endpoint posting to a local FastAPI s
 
 ## Current State (main.cpp)
 
-- `src/main.cpp` posts JSON every 10 seconds via `HTTPClient` to `SERVER_URL`.
-- Payload currently includes `user_id`, `action`, and `count`.
-- Touch edge detection increments `count` only on press transition.
-- Wi-Fi SSID/password and endpoint URL are loaded from `include/secrets.h`.
+- `src/main.cpp` has two responsibilities running in parallel:
+  - `loop()` handles touch sensing, edge detection, and LED output.
+  - `wifiTask` (pinned to Core1) posts JSON to `SERVER_URL` every 10 seconds.
+- Touch behavior uses `touchRead(T0)` and a threshold (`value < 50`) to detect press.
+- `count` is incremented only on press transition (`isTouched && !wasTouched`) to avoid repeat increments during continuous touch.
+- This means count increases when touch starts (edge), not while a finger is continuously held on the sensor.
+- Touch state is reflected to hardware output with `digitalWrite(LED_PIN, isTouched ? HIGH : LOW)`.
+- `wasTouched = isTouched` updates previous state each loop to keep edge detection stable.
+- Wi-Fi credentials and endpoint URL are loaded from `include/secrets.h`.
+- Posted payload includes `user_id`, `action`, and `count`.
+- Server response is parsed with ArduinoJson, and `server_date` is used for daily reset logic.
+- If `server_date` changes from the previous valid value, `count` is reset to `0` and `lastServerDate` is updated.
 - Secrets are already separated from source and should remain out of git.
-- Date-based reset from server response is not implemented yet.
 
 ## Migration Delta
 
 - Keep touch counting and periodic POST behavior.
 - Change server target from former Google endpoint workflow to FastAPI endpoint.
-- Parse FastAPI response JSON and read `server_date`.
-- Track last received date and reset `count = 0` when date changes.
+- Keep FastAPI response parsing for `server_date`.
+- Keep date-change reset behavior (`count = 0`) based on server date.
 
 ## Inputs To Confirm
 
@@ -86,7 +93,7 @@ Recommended column order:
 ## ESP32 Notes
 
 - Keep HTTP timeout and response-code checks.
-- Reset logic should only run when response is valid and `server_date` is present.
+- Reset logic runs only when response JSON is valid and `server_date` is present.
 - Preserve edge-detection touch counting behavior.
 
 ## Security Notes
