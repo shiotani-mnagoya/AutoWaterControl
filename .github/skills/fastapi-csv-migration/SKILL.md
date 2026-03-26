@@ -24,7 +24,7 @@ Migrate an ESP32 data pipeline from Google endpoint posting to a local FastAPI s
 - Touch behavior uses `touchRead(T0)` and a threshold (`value < 50`) to detect press.
 - `count` is incremented only on press transition (`isTouched && !wasTouched`) to avoid repeat increments during continuous touch.
 - This means count increases when touch starts (edge), not while a finger is continuously held on the sensor.
-- Touch state is reflected to hardware output with `digitalWrite(LED_PIN, isTouched ? HIGH : LOW)`.
+- Touch state is reflected to hardware output with `digitalWrite(OUTPUT_PIN, isTouched ? HIGH : LOW)`.
 - `wasTouched = isTouched` updates previous state each loop to keep edge detection stable.
 - Wi-Fi credentials and endpoint URL are loaded from `include/secrets.h`.
 - Posted payload includes `user_id`, `action`, and `count`.

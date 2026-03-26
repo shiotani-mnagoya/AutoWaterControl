@@ -4,7 +4,7 @@
 #include "secrets.h"
 
 #define TOUCH_PIN T0
-#define LED_PIN 5
+#define OUTPUT_PIN 5
 
 int threshold = 50;
 // ===== 共有データ =====
@@ -56,7 +56,7 @@ void wifiTask(void *pvParameters) {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(LED_PIN, OUTPUT);
+  pinMode(OUTPUT_PIN, OUTPUT);
 
   // Wi-Fi接続
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -87,7 +87,7 @@ void loop() {
   }
 
   // LED
-  digitalWrite(LED_PIN, isTouched ? HIGH : LOW);
+  digitalWrite(OUTPUT_PIN, isTouched ? HIGH : LOW);
   wasTouched = isTouched;
   delay(10); // 軽い安定化
 }
