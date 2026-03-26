@@ -1,26 +1,3 @@
-// #include <Arduino.h>
-// int touchPin = T0;   // タッチセンサーピン
-// int ledPin = 5;      // LED接続ピン
-
-// int threshold = 60;  // 閾値（調整必要）
-
-// void setup() {
-//   Serial.begin(115200);
-//   pinMode(ledPin, OUTPUT);
-// }
-
-// void loop() {
-//   int value = touchRead(touchPin);
-//   Serial.println(value);
-
-//   if (value < threshold) {
-//     digitalWrite(ledPin, HIGH);  // タッチで点灯
-//   } else {
-//     digitalWrite(ledPin, LOW);   // 離すと消灯
-//   }
-
-//   delay(50);
-// }
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include "secrets.h"
