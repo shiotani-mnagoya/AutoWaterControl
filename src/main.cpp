@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <ArduinoJson.h>
 #include "secrets.h"
 
 #define TOUCH_PIN T0
@@ -9,6 +10,7 @@ int threshold = 50;
 // ===== 共有データ =====
 volatile int count = 0;
 bool wasTouched = false;
+String lastServerDate = "";
 
 // ===== 送信用タスク =====
 void wifiTask(void *pvParameters) {
@@ -28,6 +30,22 @@ void wifiTask(void *pvParameters) {
 
       Serial.print("POST: ");
       Serial.println(httpResponseCode);
+
+      if (httpResponseCode > 0) {
+        String responseBody = http.getString();
+        Serial.println(responseBody);
+
+        JsonDocument doc;
+        DeserializationError err = deserializeJson(doc, responseBody);
+        if (!err && doc["server_date"].is<const char*>()) {
+          String serverDate = String(doc["server_date"].as<const char*>());
+          if (lastServerDate.length() > 0 && serverDate != lastServerDate) {
+            count = 0;
+            Serial.println("Date changed. Count reset to 0.");
+          }
+          lastServerDate = serverDate;
+        }
+      }
 
       http.end();
     }
