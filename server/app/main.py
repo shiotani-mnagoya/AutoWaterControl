@@ -9,7 +9,8 @@ from pydantic import BaseModel, Field
 
 app = FastAPI(title="AutoWaterControl API")
 
-CSV_PATH = Path("server/data/events.csv")
+BASE_DIR = Path(__file__).resolve().parents[1]
+CSV_PATH = BASE_DIR / "data" / "events.csv"
 CSV_HEADERS = [
     "received_at",
     "server_date",

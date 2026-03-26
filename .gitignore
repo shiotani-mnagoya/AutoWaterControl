@@ -6,3 +6,5 @@
 include/secrets.h
 server/data/*.csv
 server/.venv/
+__pycache__/
+*.pyc
