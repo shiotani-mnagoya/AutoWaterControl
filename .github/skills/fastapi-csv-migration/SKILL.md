@@ -19,8 +19,9 @@ Migrate an ESP32 data pipeline from Google endpoint posting to a local FastAPI s
 ## Current State (main.cpp)
 
 - `src/main.cpp` has two responsibilities running in parallel:
-  - `loop()` handles touch sensing, edge detection, and LED output.
+  - `loop()` handles touch sensing, edge detection, and OUTPUT pin control.
   - `wifiTask` (pinned to Core1) posts JSON to `SERVER_URL` every 10 seconds.
+- Wi-Fi connection start is non-blocking in `setup()` (no wait loop), so touch detection and output control run even when Wi-Fi is not connected.
 - Touch behavior uses `touchRead(T0)` and a threshold (`value < 50`) to detect press.
 - `count` is incremented only on press transition (`isTouched && !wasTouched`) to avoid repeat increments during continuous touch.
 - This means count increases when touch starts (edge), not while a finger is continuously held on the sensor.
@@ -28,6 +29,7 @@ Migrate an ESP32 data pipeline from Google endpoint posting to a local FastAPI s
 - `wasTouched = isTouched` updates previous state each loop to keep edge detection stable.
 - Wi-Fi credentials and endpoint URL are loaded from `include/secrets.h`.
 - Posted payload includes `user_id`, `action`, and `count`.
+- When Wi-Fi is disconnected, `wifiTask` attempts `WiFi.reconnect()` and skips POST until connected.
 - Server response is parsed with ArduinoJson, and `server_date` is used for daily reset logic.
 - If `server_date` changes from the previous valid value, `count` is reset to `0` and `lastServerDate` is updated.
 - Secrets are already separated from source and should remain out of git.

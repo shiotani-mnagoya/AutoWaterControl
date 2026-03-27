@@ -48,6 +48,9 @@ void wifiTask(void *pvParameters) {
       }
 
       http.end();
+    } else {
+      // Wi-Fi未接続時は再接続を試みる（loop側のタッチ判定は継続）
+      WiFi.reconnect();
     }
 
     vTaskDelay(10000 / portTICK_PERIOD_MS); // 10秒ごと
@@ -58,11 +61,9 @@ void setup() {
   Serial.begin(115200);
   pinMode(OUTPUT_PIN, OUTPUT);
 
-  // Wi-Fi接続
+  // Wi-Fi接続開始（接続完了待ちはしない）
+  WiFi.setAutoReconnect(true);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(100);
-  }
 
   // ===== タスク作成 =====
   xTaskCreatePinnedToCore(
